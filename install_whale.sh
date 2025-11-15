@@ -146,7 +146,7 @@ create_network() {
     docker network create \
         --driver overlay \
         --attachable \
-        --subnet 10.0.0.0/24 \
+        --subnet 10.0.0.0/16 \
         ctfd_frp-containers
     
     log_success "网络创建完成"
