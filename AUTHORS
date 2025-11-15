@@ -1,0 +1,62 @@
+# Authors and Contributors
+
+## Project Maintainer
+
+**fpclose** <lsszuishuai@gmail.com>
+- Project lead and primary maintainer
+- Secondary development for CTFd 3.8.1 compatibility
+- Automated deployment solution
+- Documentation and examples
+
+## Original Whale Plugin
+
+**frankli0324** (Frank Li)
+- Original CTFd Whale plugin author
+- GitHub: https://github.com/frankli0324/ctfd-whale
+
+## Acknowledgments
+
+### CTFd Team
+- **Kevin Chung** and the CTFd team for the excellent CTF framework
+- GitHub: https://github.com/CTFd/CTFd
+
+### FRP Project
+- **fatedier** and contributors for the FRP (Fast Reverse Proxy) project
+- GitHub: https://github.com/fatedier/frp
+
+### Docker Community
+- Docker team for containerization technology
+- Docker Swarm development team
+
+### Contributors
+
+This project welcomes contributions. If you have contributed to this project, please add your name here via pull request:
+
+<!-- Add your name, email (optional), and contribution below -->
+<!--
+- Your Name <email@example.com>
+  - Brief description of contribution
+-->
+
+## How to Contribute
+
+We welcome contributions from everyone! Please see:
+- [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
+- [GitHub Issues](https://github.com/fpclose/ctfd_3.8.1_whale/issues) for bug reports and feature requests
+- [GitHub Pull Requests](https://github.com/fpclose/ctfd_3.8.1_whale/pulls) to submit changes
+
+## Special Thanks
+
+Special thanks to:
+- All users who reported bugs and provided feedback
+- Security researchers who responsibly disclosed vulnerabilities
+- Documentation contributors
+- Community members who helped with testing
+
+---
+
+**Project**: CTFd Whale Plugin for CTFd 3.8.1  
+**Repository**: https://github.com/fpclose/ctfd_3.8.1_whale  
+**License**: MIT License  
+**Last Updated**: 2025-11-15
+

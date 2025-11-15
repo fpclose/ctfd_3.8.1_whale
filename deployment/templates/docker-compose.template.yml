@@ -1,0 +1,178 @@
+# CTFd Whale Docker Compose 配置模板
+# 版本: 2.0
+# 适用于: CTFd 3.8.1
+
+# 使用说明:
+# 1. 复制此文件到 CTFd 根目录并重命名为 docker-compose.yml
+# 2. 根据实际情况修改配置（标记为 CHANGE_ME 的部分）
+# 3. 运行 docker compose up -d 启动服务
+
+services:
+  ctfd:
+    build: .
+    user: root
+    restart: always
+    ports:
+      - "8000:8000"  # 可修改外部端口，如 "80:8000"
+    environment:
+      - UPLOAD_FOLDER=/var/uploads
+      # 数据库连接（使用固定 IP，更稳定）
+      - DATABASE_URL=mysql+pymysql://ctfd:ctfd@172.19.0.3/ctfd
+      # Redis 连接
+      - REDIS_URL=redis://172.19.0.2:6379
+      # Worker 数量（根据 CPU 核心数调整）
+      - WORKERS=1
+      - LOG_FOLDER=/var/log/CTFd
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+      - REVERSE_PROXY=true
+    volumes:
+      # 日志目录
+      - .data/CTFd/logs:/var/log/CTFd
+      # 上传文件目录
+      - .data/CTFd/uploads:/var/uploads
+      # CTFd 代码（只读）
+      - .:/opt/CTFd:ro
+      # Docker socket（Whale 插件需要）
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      frpc:
+        condition: service_started
+    links:
+      - db
+      - cache
+      - frpc
+    networks:
+      default:
+        ipv4_address: 172.19.0.4
+        aliases: [ ctfd ]
+
+  nginx:
+    image: nginx:stable
+    restart: always
+    volumes:
+      - ./conf/nginx/http.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"   # HTTP 端口
+      # - "443:443" # 启用 HTTPS 时取消注释
+    depends_on:
+      ctfd:
+        condition: service_started
+    links:
+      - ctfd
+    networks:
+      default:
+        ipv4_address: 172.19.0.5
+
+  db:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      # CHANGE_ME: 生产环境请修改密码
+      - MARIADB_ROOT_PASSWORD=ctfd
+      - MARIADB_USER=ctfd
+      - MARIADB_PASSWORD=ctfd
+      - MARIADB_DATABASE=ctfd
+      - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      # 数据库数据持久化
+      - .data/mysql:/var/lib/mysql
+    networks:
+      default:
+        ipv4_address: 172.19.0.3
+        aliases: [ db ]
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  cache:
+    image: redis:4
+    restart: always
+    volumes:
+      # Redis 数据持久化
+      - .data/redis:/data
+    networks:
+      default:
+        ipv4_address: 172.19.0.2
+        aliases: [ cache ]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  frpc:
+    # FRP 版本建议与 Server 保持一致
+    image: snowdreamtech/frpc:0.52.3
+    restart: always
+    ports:
+      - "7400:7400"  # FRP Admin API 端口
+    volumes:
+      # FRP Client 配置（读写模式，允许动态更新）
+      - ./conf/frp/frpc.ini:/etc/frp/frpc.ini
+    entrypoint: ["/usr/bin/frpc", "-c", "/etc/frp/frpc.ini"]
+    extra_hosts:
+      # Linux 上映射 host.docker.internal 到宿主机
+      - "host.docker.internal:host-gateway"
+    networks:
+      default:
+        ipv4_address: 172.19.0.10
+      # 动态容器网络（必须）
+      frp-containers:
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        # 默认网络子网（可修改，避免冲突）
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
+  
+  frp-containers:
+    # 外部网络（需要预先创建）
+    # docker network create --driver overlay --attachable ctfd_frp-containers
+    external: true
+    name: ctfd_frp-containers
+
+# 其他配置说明:
+# 
+# 1. 端口映射
+#    - 80: Nginx HTTP
+#    - 8000: CTFd 直接访问（可选）
+#    - 7400: FRP Admin API
+#    - 7897: FRP Server 端口（在宿主机）
+#    - 8080: FRP HTTP 虚拟主机（在宿主机）
+#    - 10000-10100: 动态题目端口（在宿主机）
+# 
+# 2. 数据持久化
+#    - .data/CTFd/: CTFd 数据（日志、上传）
+#    - .data/mysql/: 数据库数据
+#    - .data/redis/: Redis 数据
+# 
+# 3. 资源限制（可选）
+#    在每个服务下添加:
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '2'
+#          memory: 2G
+#        reservations:
+#          cpus: '1'
+#          memory: 1G
+# 
+# 4. 日志配置（可选）
+#    在每个服务下添加:
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "10m"
+#        max-file: "3"
+
