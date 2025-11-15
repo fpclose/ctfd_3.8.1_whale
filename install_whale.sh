@@ -3,7 +3,7 @@
 # CTFd Whale 自动化安装脚本
 # 版本: 2.0
 # 适用于: CTFd 3.8.1
-# 作者: CTFd Whale Deployment Team
+# 作者: fpclose
 
 set -e  # 遇到错误立即退出
 
