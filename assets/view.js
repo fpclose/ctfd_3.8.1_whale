@@ -8,11 +8,23 @@ CTFd._internal.challenge.preRender = function () {
 CTFd._internal.challenge.render = null;
 
 CTFd._internal.challenge.postRender = function () {
-    loadInfo();
+    // 延迟执行，等待 Alpine.js 渲染完成
+    setTimeout(function() {
+        loadInfo();
+    }, 100);
 }
 
 function loadInfo() {
-    var challenge_id = document.getElementById('challenge-id').value;
+    var challengeIdElement = document.getElementById('challenge-id');
+    if (!challengeIdElement) {
+        console.error('challenge-id element not found, retrying...');
+        // 如果元素未找到，再次延迟重试
+        setTimeout(function() {
+            loadInfo();
+        }, 200);
+        return;
+    }
+    var challenge_id = challengeIdElement.value;
     var url = "/api/v1/plugins/ctfd-whale/container?challenge_id=" + challenge_id;
 
     var params = {};
@@ -39,12 +51,20 @@ function loadInfo() {
             clearInterval(window.t);
             window.t = undefined;
         }
-        if (response.success) response = response.data;
-        else CTFd.ui.ezq.ezAlert({
-            title: "失败",
-            body: response.message,
-            button: "OK"
-        });
+        if (response.success) {
+            response = response.data;
+        } else {
+            if (CTFd.ui && CTFd.ui.ezq && CTFd.ui.ezq.ezAlert) {
+                CTFd.ui.ezq.ezAlert({
+                    title: "失败",
+                    body: response.message,
+                    button: "OK"
+                });
+            } else {
+                alert("失败: " + response.message);
+            }
+            return;
+        }
         if (response.remaining_time === undefined) {
             document.getElementById('whale-panel').innerHTML = '<div class="tabpanel" style="width: 100%;">' +
                 '<div class="card-body">' +
@@ -126,22 +146,30 @@ CTFd._internal.challenge.destroy = function () {
     }).then(function (response) {
         if (response.success) {
             loadInfo();
-            CTFd.ui.ezq.ezAlert({
-                title: "成功",
-                body: "您的靶机已被销毁!",
-                button: "OK"
-            });
+            if (CTFd.ui && CTFd.ui.ezq && CTFd.ui.ezq.ezAlert) {
+                CTFd.ui.ezq.ezAlert({
+                    title: "成功",
+                    body: "您的靶机已被销毁!",
+                    button: "OK"
+                });
+            } else {
+                alert("成功: 您的靶机已被销毁!");
+            }
         } else {
             var btn = document.getElementById('whale-button-destroy');
             if (btn) {
                 btn.innerHTML = "销毁靶机";
                 btn.disabled = false;
             }
-            CTFd.ui.ezq.ezAlert({
-                title: "失败",
-                body: response.message,
-                button: "OK"
-            });
+            if (CTFd.ui && CTFd.ui.ezq && CTFd.ui.ezq.ezAlert) {
+                CTFd.ui.ezq.ezAlert({
+                    title: "失败",
+                    body: response.message,
+                    button: "OK"
+                });
+            } else {
+                alert("失败: " + response.message);
+            }
         }
     });
 };
@@ -177,22 +205,30 @@ CTFd._internal.challenge.renew = function () {
     }).then(function (response) {
         if (response.success) {
             loadInfo();
-            CTFd.ui.ezq.ezAlert({
-                title: "成功",
-                body: "您的靶机已成功续期!",
-                button: "OK"
-            });
+            if (CTFd.ui && CTFd.ui.ezq && CTFd.ui.ezq.ezAlert) {
+                CTFd.ui.ezq.ezAlert({
+                    title: "成功",
+                    body: "您的靶机已成功续期!",
+                    button: "OK"
+                });
+            } else {
+                alert("成功: 您的靶机已成功续期!");
+            }
         } else {
             var btn = document.getElementById('whale-button-renew');
             if (btn) {
                 btn.innerHTML = "续期靶机";
                 btn.disabled = false;
             }
-            CTFd.ui.ezq.ezAlert({
-                title: "失败",
-                body: response.message,
-                button: "OK"
-            });
+            if (CTFd.ui && CTFd.ui.ezq && CTFd.ui.ezq.ezAlert) {
+                CTFd.ui.ezq.ezAlert({
+                    title: "失败",
+                    body: response.message,
+                    button: "OK"
+                });
+            } else {
+                alert("失败: " + response.message);
+            }
         }
     });
 };
@@ -228,22 +264,30 @@ CTFd._internal.challenge.boot = function () {
     }).then(function (response) {
         if (response.success) {
             loadInfo();
-            CTFd.ui.ezq.ezAlert({
-                title: "成功",
-                body: "您的靶机已启动!",
-                button: "OK"
-            });
+            if (CTFd.ui && CTFd.ui.ezq && CTFd.ui.ezq.ezAlert) {
+                CTFd.ui.ezq.ezAlert({
+                    title: "成功",
+                    body: "您的靶机已启动!",
+                    button: "OK"
+                });
+            } else {
+                alert("成功: 您的靶机已启动!");
+            }
         } else {
             var btn = document.getElementById('whale-button-boot');
             if (btn) {
                 btn.innerHTML = "启动靶机";
                 btn.disabled = false;
             }
-            CTFd.ui.ezq.ezAlert({
-                title: "失败",
-                body: response.message,
-                button: "OK"
-            });
+            if (CTFd.ui && CTFd.ui.ezq && CTFd.ui.ezq.ezAlert) {
+                CTFd.ui.ezq.ezAlert({
+                    title: "失败",
+                    body: response.message,
+                    button: "OK"
+                });
+            } else {
+                alert("失败: " + response.message);
+            }
         }
     });
 };
@@ -252,6 +296,19 @@ CTFd._internal.challenge.boot = function () {
 CTFd._internal.challenge.submit = function (preview) {
     var challenge_id = document.getElementById('challenge-id').value;
     var submission = document.getElementById('challenge-input').value;
+    var submitBtn = document.getElementById('challenge-submit');
+    var inputField = document.getElementById('challenge-input');
+
+    // Add loading state
+    if (submitBtn) {
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+    }
+
+    // Remove previous state classes
+    if (inputField) {
+        inputField.classList.remove('success', 'error');
+    }
 
     var body = {
         'challenge_id': challenge_id,
@@ -262,6 +319,29 @@ CTFd._internal.challenge.submit = function (preview) {
         params['preview'] = true
 
     return CTFd.api.post_challenge_attempt(params, body).then(function (response) {
+        // Remove loading state
+        if (submitBtn) {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        }
+
+        // Add visual feedback based on result
+        if (response.data && response.data.status === 'correct') {
+            if (inputField) {
+                inputField.classList.add('success');
+                setTimeout(function() {
+                    inputField.classList.remove('success');
+                }, 3000);
+            }
+        } else if (response.data && response.data.status === 'incorrect') {
+            if (inputField) {
+                inputField.classList.add('error');
+                setTimeout(function() {
+                    inputField.classList.remove('error');
+                }, 3000);
+            }
+        }
+
         if (response.status === 429) {
             // User was ratelimited but process response
             return response
@@ -272,5 +352,18 @@ CTFd._internal.challenge.submit = function (preview) {
         }
         loadInfo();
         return response
+    }).catch(function(error) {
+        // Remove loading state on error
+        if (submitBtn) {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        }
+        if (inputField) {
+            inputField.classList.add('error');
+            setTimeout(function() {
+                inputField.classList.remove('error');
+            }, 3000);
+        }
+        throw error;
     })
 };

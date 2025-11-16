@@ -6,6 +6,7 @@ from CTFd.plugins.challenges import BaseChallenge, ChallengeResponse
 from CTFd.plugins.dynamic_challenges import DynamicValueChallenge
 from CTFd.plugins.flags import get_flag_class
 from CTFd.utils import user as current_user
+from CTFd.utils.config import get_config
 from .models import WhaleContainer, DynamicDockerChallenge, WhaleFlag
 from .utils.control import ControlUtil
 
@@ -75,7 +76,13 @@ class DynamicValueDockerChallenge(BaseChallenge):
                     return ChallengeResponse(status="correct", message="正确")
             return ChallengeResponse(status="incorrect", message="错误")
         else:
-            team_id = current_user.get_current_team().id
+            # 兼容 users 和 teams 模式
+            user_mode = get_config("whale:user_mode", get_config("user_mode", "teams"))
+            if user_mode == "teams":
+                team = current_user.get_current_team()
+                team_id = team.id if team else None
+            else:
+                team_id = current_user.get_current_user().id
             q = db.session.query(WhaleContainer)
             q = q.filter(WhaleContainer.team_id == team_id)
             q = q.filter(WhaleContainer.challenge_id == challenge.id)

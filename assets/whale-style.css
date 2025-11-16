@@ -1,0 +1,171 @@
+/* Whale Plugin - Minimalist Design */
+
+/* Flag Input Field - Clean & Modern */
+input.whale-flag-input,
+input#challenge-input.whale-flag-input {
+    width: 100% !important;
+    padding: 15px 20px !important;
+    font-size: 15px !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+    font-weight: 500 !important;
+    color: #2d3748 !important;
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+}
+
+input.whale-flag-input:hover,
+input#challenge-input.whale-flag-input:hover {
+    border-color: #cbd5e0 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+input.whale-flag-input:focus,
+input#challenge-input.whale-flag-input:focus {
+    border-color: #667eea !important;
+    outline: none !important;
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 4px 12px rgba(102, 126, 234, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+input.whale-flag-input::placeholder,
+input#challenge-input.whale-flag-input::placeholder {
+    color: #a0aec0 !important;
+    font-weight: 400 !important;
+}
+
+/* Submit Button - Clean & Modern */
+button.whale-submit-btn,
+button#challenge-submit.whale-submit-btn {
+    width: 100% !important;
+    padding: 14px 28px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 
+        0 4px 12px rgba(102, 126, 234, 0.3),
+        0 2px 4px rgba(118, 75, 162, 0.2) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+button.whale-submit-btn::before,
+button#challenge-submit.whale-submit-btn::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent) !important;
+    transition: left 0.5s !important;
+}
+
+button.whale-submit-btn:hover::before,
+button#challenge-submit.whale-submit-btn:hover::before {
+    left: 100% !important;
+}
+
+button.whale-submit-btn:hover,
+button#challenge-submit.whale-submit-btn:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3e8f 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 
+        0 8px 20px rgba(102, 126, 234, 0.4),
+        0 4px 8px rgba(118, 75, 162, 0.3) !important;
+}
+
+button.whale-submit-btn:active,
+button#challenge-submit.whale-submit-btn:active {
+    transform: translateY(0) !important;
+    box-shadow: 
+        0 2px 8px rgba(102, 126, 234, 0.3),
+        0 1px 4px rgba(118, 75, 162, 0.2) !important;
+}
+
+button.whale-submit-btn:focus,
+button#challenge-submit.whale-submit-btn:focus {
+    outline: none !important;
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.2),
+        0 8px 20px rgba(102, 126, 234, 0.4),
+        0 4px 8px rgba(118, 75, 162, 0.3) !important;
+}
+
+/* Loading Animation */
+button.whale-submit-btn.loading,
+button#challenge-submit.whale-submit-btn.loading {
+    color: transparent !important;
+    pointer-events: none !important;
+}
+
+button.whale-submit-btn.loading::after,
+button#challenge-submit.whale-submit-btn.loading::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 18px !important;
+    height: 18px !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin-left: -9px !important;
+    margin-top: -9px !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 50% !important;
+    border-top-color: #fff !important;
+    animation: whale-spin 0.6s linear infinite !important;
+}
+
+@keyframes whale-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success/Error State */
+input.whale-flag-input.success,
+input#challenge-input.whale-flag-input.success {
+    border-color: #48bb78 !important;
+    background: #f0fff4 !important;
+    box-shadow: 
+        0 0 0 3px rgba(72, 187, 120, 0.15),
+        0 4px 12px rgba(72, 187, 120, 0.2) !important;
+}
+
+input.whale-flag-input.error,
+input#challenge-input.whale-flag-input.error {
+    border-color: #f56565 !important;
+    background: #fff5f5 !important;
+    box-shadow: 
+        0 0 0 3px rgba(245, 101, 101, 0.15),
+        0 4px 12px rgba(245, 101, 101, 0.2) !important;
+    animation: whale-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
+}
+
+@keyframes whale-shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    input.whale-flag-input,
+    input#challenge-input.whale-flag-input {
+        font-size: 14px !important;
+        padding: 12px 16px !important;
+    }
+    
+    button.whale-submit-btn,
+    button#challenge-submit.whale-submit-btn {
+        font-size: 14px !important;
+        padding: 12px 24px !important;
+    }
+}

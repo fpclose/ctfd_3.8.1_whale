@@ -1,23 +1,3 @@
-"""
-CTFd Whale Plugin - Dynamic Container Management for CTFd
-
-Version: 2.0.0
-Author: fpclose
-Repository: https://github.com/fpclose/ctfd_3.8.1_whale
-License: MIT
-CTFd Compatibility: 3.8.1
-
-This plugin provides dynamic Docker container management for CTF challenges,
-with support for Docker Swarm orchestration and FRP port forwarding.
-"""
-
-__version__ = "2.0.0"
-__author__ = "fpclose"
-__email__ = "lsszuishuai@gmail.com"
-__repository__ = "https://github.com/fpclose/ctfd_3.8.1_whale"
-__license__ = "MIT"
-__ctfd_version__ = "3.8.1"
-
 import fcntl
 import warnings
 
@@ -72,6 +52,11 @@ def load(app):
         "update": "/plugins/ctfd-whale/assets/update.js",
         "view": "/plugins/ctfd-whale/assets/view.js",
     }
+    
+    # Register custom CSS for whale challenge styling
+    from flask import Blueprint
+    whale_bp = Blueprint('whale_assets', __name__, static_folder='assets', static_url_path='/plugins/ctfd-whale/assets')
+    app.register_blueprint(whale_bp)
     CHALLENGE_CLASSES["dynamic_docker"] = DynamicValueDockerChallenge
 
     page_blueprint = Blueprint(

@@ -71,7 +71,17 @@ class TeamContainers(Resource):
     @authed_only
     @challenge_visible
     def get():
-        team_id = current_user.get_current_team().id
+        # 兼容 users 和 teams 模式
+        user_mode = get_config("user_mode", "teams")
+        if user_mode == "teams":
+            team = current_user.get_current_team()
+            if team is None:
+                abort(403, '请先创建或加入团队', success=False)
+            team_id = team.id
+        else:
+            # users 模式下使用 user_id 作为 team_id
+            team_id = current_user.get_current_user().id
+        
         challenge_id = request.args.get('challenge_id')
         container = DBContainer.get_current_containers(team_id=team_id, challenge_id=challenge_id)
         if not container:
@@ -93,7 +103,17 @@ class TeamContainers(Resource):
     @challenge_visible
     @frequency_limited
     def post():
-        team_id = current_user.get_current_team().id
+        # 兼容 users 和 teams 模式
+        user_mode = get_config("user_mode", "teams")
+        if user_mode == "teams":
+            team = current_user.get_current_team()
+            if team is None:
+                abort(403, '请先创建或加入团队', success=False)
+            team_id = team.id
+        else:
+            # users 模式下使用 user_id 作为 team_id
+            team_id = current_user.get_current_user().id
+        
         challenge_id = request.args.get('challenge_id')
         ControlUtil.try_remove_container(team_id, challenge_id)
 
@@ -118,7 +138,17 @@ class TeamContainers(Resource):
     @challenge_visible
     @frequency_limited
     def patch():
-        team_id = current_user.get_current_team().id
+        # 兼容 users 和 teams 模式
+        user_mode = get_config("user_mode", "teams")
+        if user_mode == "teams":
+            team = current_user.get_current_team()
+            if team is None:
+                abort(403, '请先创建或加入团队', success=False)
+            team_id = team.id
+        else:
+            # users 模式下使用 user_id 作为 team_id
+            team_id = current_user.get_current_user().id
+        
         challenge_id = request.args.get('challenge_id')
         docker_max_renew_count = int(get_config("whale:docker_max_renew_count", 5))
         container = DBContainer.get_current_containers(team_id, challenge_id)
@@ -133,11 +163,26 @@ class TeamContainers(Resource):
 
     @staticmethod
     @authed_only
-    @frequency_limited
     def delete():
-        team_id = current_user.get_current_team().id
+        # 兼容 users 和 teams 模式
+        user_mode = get_config("user_mode", "teams")
+        if user_mode == "teams":
+            team = current_user.get_current_team()
+            if team is None:
+                abort(403, '请先创建或加入团队', success=False)
+            team_id = team.id
+        else:
+            # users 模式下使用 user_id 作为 team_id
+            team_id = current_user.get_current_user().id
+        
         challenge_id = request.args.get('challenge_id')
         result, message = ControlUtil.try_remove_container(team_id, challenge_id)
         if not result:
             abort(403, message, success=False)
+        
+        # 销毁成功后，重置冷却时间，确保用户需要等待才能启动新的
+        from flask import session
+        import time
+        session["limit"] = int(time.time())
+        
         return {'success': True, 'message': message}
