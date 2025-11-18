@@ -1,0 +1,128 @@
+# CTFd Whale 部署文件清单
+
+## 将以下文件复制到新的 CTFd 3.8.1 安装目录
+
+### 核心文档（必需）
+- WHALE_README.md
+- QUICKSTART.md
+- WHALE_DEPLOYMENT_GUIDE.md
+- CHALLENGE_BUILD_GUIDE.md
+- TROUBLESHOOTING.md
+- ACCESS_TYPE_GUIDE.md
+
+### 自动化脚本（必需）
+- install_whale.sh
+
+### 配置模板（必需）
+- templates/docker-compose.template.yml
+- templates/frps.template.ini
+- templates/frpc.template.ini
+- templates/nginx.template.conf
+
+### 可选文件
+- FINAL_SUCCESS_REPORT.md (参考)
+- SUCCESS_SUMMARY.md (参考)
+- WHALE_FIX_SUMMARY.md (参考)
+- WHALE_SETUP_GUIDE.md (参考)
+
+## 部署步骤
+
+1. 在新服务器上克隆 CTFd 3.8.1
+   ```bash
+   cd /opt
+   git clone https://github.com/CTFd/CTFd.git
+   cd CTFd
+   git checkout 3.8.1
+   ```
+
+2. 将上述文件复制到 /opt/CTFd/ 目录
+   ```bash
+   # 核心文档
+   cp WHALE_README.md /opt/CTFd/
+   cp QUICKSTART.md /opt/CTFd/
+   cp WHALE_DEPLOYMENT_GUIDE.md /opt/CTFd/
+   cp CHALLENGE_BUILD_GUIDE.md /opt/CTFd/
+   cp TROUBLESHOOTING.md /opt/CTFd/
+   cp ACCESS_TYPE_GUIDE.md /opt/CTFd/
+   
+   # 安装脚本
+   cp install_whale.sh /opt/CTFd/
+   chmod +x /opt/CTFd/install_whale.sh
+   
+   # 配置模板
+   mkdir -p /opt/CTFd/templates
+   cp templates/* /opt/CTFd/templates/
+   ```
+
+3. 运行一键安装
+   ```bash
+   cd /opt/CTFd
+   sudo ./install_whale.sh
+   ```
+
+4. 按提示完成配置
+
+## 最小文件集（只需这些即可部署）
+
+如果只想快速部署，最少需要这些文件：
+
+```
+/opt/CTFd/
+├── install_whale.sh          ⭐ 一键安装脚本（自动完成所有配置）
+├── QUICKSTART.md             ⭐ 快速参考
+└── templates/                ⭐ 配置模板（脚本会使用）
+    ├── docker-compose.template.yml
+    ├── frps.template.ini
+    ├── frpc.template.ini
+    └── nginx.template.conf
+```
+
+其他文档是为了帮助理解和排错，非必需。
+
+## 验证清单
+
+部署完成后检查：
+
+- [ ] 所有文档都已复制
+- [ ] install_whale.sh 有执行权限
+- [ ] templates/ 目录存在且包含 4 个模板文件
+- [ ] 运行 ./install_whale.sh 能正常执行
+- [ ] 服务启动成功（docker compose ps）
+- [ ] 可以访问 CTFd (http://your_ip)
+- [ ] Whale 插件配置正确
+- [ ] 能成功创建和启动测试题目
+
+## 打包命令
+
+如果要打包这些文件方便分发：
+
+```bash
+cd /opt/CTFd
+tar -czf ctfd-whale-deployment-v2.0.tar.gz \
+  WHALE_README.md \
+  QUICKSTART.md \
+  WHALE_DEPLOYMENT_GUIDE.md \
+  CHALLENGE_BUILD_GUIDE.md \
+  TROUBLESHOOTING.md \
+  ACCESS_TYPE_GUIDE.md \
+  install_whale.sh \
+  templates/
+
+# 分发这个压缩包
+# 在新服务器上解压到 /opt/CTFd/ 即可
+```
+
+## 使用说明
+
+1. 下载或克隆 CTFd 3.8.1
+2. 解压 ctfd-whale-deployment-v2.0.tar.gz 到 CTFd 目录
+3. 运行 sudo ./install_whale.sh
+4. 按提示配置
+5. 完成！
+
+---
+
+版本: 2.0
+日期: 2025-11-15
+适用: CTFd 3.8.1
+

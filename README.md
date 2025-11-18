@@ -2,10 +2,8 @@
 
 **Version**: 2.0 Enhanced  
 **CTFd Compatibility**: 3.8.1  
-**Author**: fpclose  
 **Last Updated**: 2025-11-15  
 **License**: MIT  
-**Repository**: https://github.com/fpclose/ctfd_3.8.1_whale  
 
 ---
 
